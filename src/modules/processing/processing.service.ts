@@ -20,23 +20,30 @@ export class ProcessingService {
   }
 
   async startProcessing(articleId: number) {
-    const article = await this.prisma.article.findUnique({
-      where: { id: articleId },
-    });
-
-    if (!article) {
-      throw new NotFoundException('Article not found');
-    }
-
-    if (article.status !== ArticleStatus.COLLECTED) {
-      throw new BadRequestException('Article is not ready for processing');
-    }
-
-    return this.prisma.article.update({
-      where: { id: articleId },
+    const result = await this.prisma.article.updateMany({
+      where: {
+        id: articleId,
+        status: ArticleStatus.COLLECTED,
+      },
       data: {
         status: ArticleStatus.PROCESSING,
       },
+    });
+
+    if (result.count === 0) {
+      const article = await this.prisma.article.findUnique({
+        where: { id: articleId },
+      });
+
+      if (!article) {
+        throw new NotFoundException('Article not found');
+      }
+
+      throw new BadRequestException('Article is not ready for processing');
+    }
+
+    return this.prisma.article.findUnique({
+      where: { id: articleId },
     });
   }
 
