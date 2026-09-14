@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 
 import { PrismaService } from '../../common/prisma/prisma.service.js';
+import { CreateSourceDto } from './dto/create-source.dto.js';
 
 @Injectable()
 export class SourcesService {
@@ -8,5 +9,11 @@ export class SourcesService {
 
   findAll() {
     return this.prisma.source.findMany();
+  }
+
+  create(createSourceDto: CreateSourceDto) {
+    return this.prisma.source.create({
+      data: createSourceDto,
+    });
   }
 }
