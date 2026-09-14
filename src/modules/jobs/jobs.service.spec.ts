@@ -25,11 +25,7 @@ describe('JobsService', () => {
   });
 
   it('should process all pending articles', async () => {
-    const articles = [
-      { id: 1 },
-      { id: 2 },
-      { id: 3 },
-    ];
+    const articles = [{ id: 1 }, { id: 2 }, { id: 3 }];
 
     processingService.findPendingArticles.mockResolvedValue(articles);
     processingService.startProcessing.mockResolvedValue({});
