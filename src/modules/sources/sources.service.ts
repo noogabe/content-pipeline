@@ -6,42 +6,42 @@ import { UpdateSourceDto } from './dto/update-source.dto.js';
 
 @Injectable()
 export class SourcesService {
-    constructor(private readonly prisma: PrismaService) { }
+  constructor(private readonly prisma: PrismaService) {}
 
-    findAll() {
-        return this.prisma.source.findMany();
+  findAll() {
+    return this.prisma.source.findMany();
+  }
+
+  async findOne(id: number) {
+    const source = await this.prisma.source.findUnique({
+      where: { id },
+    });
+
+    if (!source) {
+      throw new NotFoundException('Source not found');
     }
 
-    async findOne(id: number) {
-        const source = await this.prisma.source.findUnique({
-            where: { id },
-        });
+    return source;
+  }
 
-        if (!source) {
-            throw new NotFoundException('Source not found');
-        }
+  create(createSourceDto: CreateSourceDto) {
+    return this.prisma.source.create({
+      data: createSourceDto,
+    });
+  }
 
-        return source;
+  async update(id: number, updateSourceDto: UpdateSourceDto) {
+    const source = await this.prisma.source.findUnique({
+      where: { id },
+    });
+
+    if (!source) {
+      throw new NotFoundException('Source not found');
     }
 
-    create(createSourceDto: CreateSourceDto) {
-        return this.prisma.source.create({
-            data: createSourceDto,
-        });
-    }
-
-    async update(id: number, updateSourceDto: UpdateSourceDto) {
-        const source = await this.prisma.source.findUnique({
-            where: { id },
-        });
-
-        if (!source) {
-            throw new NotFoundException('Source not found');
-        }
-
-        return this.prisma.source.update({
-            where: { id },
-            data: updateSourceDto,
-        });
-    }
+    return this.prisma.source.update({
+      where: { id },
+      data: updateSourceDto,
+    });
+  }
 }

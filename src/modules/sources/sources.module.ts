@@ -4,6 +4,6 @@ import { SourcesService } from './sources.service.js';
 
 @Module({
   controllers: [SourcesController],
-  providers: [SourcesService]
+  providers: [SourcesService],
 })
 export class SourcesModule {}
