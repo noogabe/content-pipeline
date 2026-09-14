@@ -51,7 +51,6 @@ describe('SourcesController', () => {
     expect(sourcesServiceMock.findAll).toHaveBeenCalled();
   });
 
-
   it('should return a source by id', async () => {
     const source = {
       id: 1,
@@ -111,4 +110,3 @@ describe('SourcesController', () => {
     expect(sourcesServiceMock.update).toHaveBeenCalledWith(1, updateSourceDto);
   });
 });
-

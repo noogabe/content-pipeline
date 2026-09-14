@@ -166,6 +166,4 @@ describe('SourcesService', () => {
 
     expect(prismaMock.source.update).not.toHaveBeenCalled();
   });
-
 });
-
