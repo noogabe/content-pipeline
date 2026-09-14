@@ -1,7 +1,8 @@
-import { Controller, Get, Post, Body, Param } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Body, Param } from '@nestjs/common';
 
 import { SourcesService } from './sources.service.js';
 import { CreateSourceDto } from './dto/create-source.dto.js';
+import { UpdateSourceDto } from './dto/update-source.dto.js';
 
 @Controller('sources')
 export class SourcesController {
@@ -20,5 +21,13 @@ export class SourcesController {
     @Post()
     create(@Body() createSourceDto: CreateSourceDto) {
         return this.sourcesService.create(createSourceDto);
+    }
+
+    @Patch(':id')
+    update(
+        @Param('id') id: string,
+        @Body() updateSourceDto: UpdateSourceDto,
+    ) {
+        return this.sourcesService.update(Number(id), updateSourceDto);
     }
 }
