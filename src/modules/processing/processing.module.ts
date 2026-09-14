@@ -5,5 +5,6 @@ import { ProcessingService } from './processing.service.js';
 @Module({
   controllers: [ProcessingController],
   providers: [ProcessingService],
+  exports: [ProcessingService],
 })
 export class ProcessingModule {}
