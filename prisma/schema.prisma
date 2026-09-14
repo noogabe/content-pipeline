@@ -7,6 +7,14 @@ datasource db {
   provider = "postgresql"
 }
 
+enum ArticleStatus {
+  COLLECTED
+  PROCESSING
+  READY_TO_PUBLISH
+  PUBLISHED
+  FAILED
+}
+
 model Source {
   id        Int       @id @default(autoincrement())
   name      String
@@ -24,7 +32,7 @@ model Article {
   title       String
   content     String
   url         String
-  status      String
+  status ArticleStatus @default(COLLECTED)
   collectedAt DateTime @default(now())
   processedAt DateTime?
   publishedAt DateTime?
