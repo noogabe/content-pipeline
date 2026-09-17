@@ -7,6 +7,7 @@ import { SourcesModule } from './modules/sources/sources.module.js';
 import { ArticlesModule } from './modules/articles/articles.module.js';
 import { ProcessingModule } from './modules/processing/processing.module.js';
 import { JobsModule } from './modules/jobs/jobs.module.js';
+import { PublishingModule } from './modules/publishing/publishing.module.js';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { JobsModule } from './modules/jobs/jobs.module.js';
     ArticlesModule,
     ProcessingModule,
     JobsModule,
+    PublishingModule,
   ],
 })
 export class AppModule {}
