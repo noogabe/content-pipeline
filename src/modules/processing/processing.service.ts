@@ -6,10 +6,11 @@ import {
 
 import { PrismaService } from '../../common/prisma/prisma.service.js';
 import { ArticleStatus } from '../../generated/prisma/enums.js';
+import { ArticleProcessingConflictException } from './exceptions/article-processing-conflict.exception.js';
 
 @Injectable()
 export class ProcessingService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) { }
 
   findPendingArticles() {
     return this.prisma.article.findMany({
@@ -39,11 +40,13 @@ export class ProcessingService {
         throw new NotFoundException('Article not found');
       }
 
-      throw new BadRequestException('Article is not ready for processing');
+      throw new ArticleProcessingConflictException();
     }
 
     return this.prisma.article.findUnique({
-      where: { id: articleId },
+      where: {
+        id: articleId,
+      },
     });
   }
 

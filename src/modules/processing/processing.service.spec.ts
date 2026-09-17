@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { PrismaService } from '../../common/prisma/prisma.service.js';
 import { ArticleStatus } from '../../generated/prisma/enums.js';
+import { ArticleProcessingConflictException } from './exceptions/article-processing-conflict.exception.js';
 import { ProcessingService } from './processing.service.js';
 
 describe('ProcessingService', () => {
@@ -100,7 +101,7 @@ describe('ProcessingService', () => {
       });
     });
 
-    it('should throw BadRequestException when article is not collected', async () => {
+    it('should throw ArticleProcessingConflictException when article is not collected', async () => {
       prisma.article.updateMany.mockResolvedValue({ count: 0 });
 
       prisma.article.findUnique.mockResolvedValue({
@@ -109,7 +110,7 @@ describe('ProcessingService', () => {
       });
 
       await expect(service.startProcessing(1)).rejects.toThrow(
-        BadRequestException,
+        ArticleProcessingConflictException,
       );
 
       expect(prisma.article.updateMany).toHaveBeenCalledWith({
@@ -121,6 +122,35 @@ describe('ProcessingService', () => {
           status: ArticleStatus.PROCESSING,
         },
       });
+    });
+
+    it('should allow only one processing attempt to claim an article', async () => {
+      const article = {
+        id: 1,
+        status: ArticleStatus.PROCESSING,
+      };
+
+      prisma.article.updateMany
+        .mockResolvedValueOnce({ count: 1 })
+        .mockResolvedValueOnce({ count: 0 });
+
+      prisma.article.findUnique.mockResolvedValue(article);
+
+      const results = await Promise.allSettled([
+        service.startProcessing(1),
+        service.startProcessing(1),
+      ]);
+
+      expect(results[0].status).toBe('fulfilled');
+      expect(results[1].status).toBe('rejected');
+
+      if (results[1].status === 'rejected') {
+        expect(results[1].reason).toBeInstanceOf(
+          ArticleProcessingConflictException,
+        );
+      }
+
+      expect(prisma.article.updateMany).toHaveBeenCalledTimes(2);
     });
   });
 
@@ -179,33 +209,5 @@ describe('ProcessingService', () => {
 
       expect(prisma.article.update).not.toHaveBeenCalled();
     });
-
-    it('should allow only one processing attempt to claim an article', async () => {
-      const article = {
-        id: 1,
-        status: ArticleStatus.PROCESSING,
-      };
-
-      prisma.article.updateMany
-        .mockResolvedValueOnce({ count: 1 })
-        .mockResolvedValueOnce({ count: 0 });
-
-      prisma.article.findUnique.mockResolvedValue(article);
-
-      const results = await Promise.allSettled([
-        service.startProcessing(1),
-        service.startProcessing(1),
-      ]);
-
-      expect(results[0].status).toBe('fulfilled');
-      expect(results[1].status).toBe('rejected');
-
-      if (results[1].status === 'rejected') {
-        expect(results[1].reason).toBeInstanceOf(BadRequestException);
-      }
-
-      expect(prisma.article.updateMany).toHaveBeenCalledTimes(2);
-    });
-
   });
 });
